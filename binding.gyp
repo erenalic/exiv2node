@@ -7,7 +7,8 @@
       ],
       'include_dirs' : [
         '<!@(pkg-config --variable=includedir exiv2)',
-        "<!(node -e \"require('nan')\")"
+        "<!(node -e \"require('nan')\")",
+        "<!(node -p \"require('node-addon-api').include\")"
       ],
       'xcode_settings': {
         'MACOSX_DEPLOYMENT_TARGET': '10.7',
