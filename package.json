@@ -7,10 +7,10 @@
   "name": "exiv2",
   "description": "A native c++ extension for node.js that provides support for reading & writing image metadata via Exiv2.",
   "version": "0.6.3",
-  "homepage": "https://github.com/dberesford/exiv2node",
+  "homepage": "github.com/erenalic/exiv2node.git",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dberesford/exiv2node.git"
+    "url": "git://github.com/erenalic/exiv2node.git"
   },
   "dependencies": {
     "nan": "~2.2"
@@ -21,7 +21,7 @@
   },
   "optionalDependencies": {},
   "engines": {
-    "node": "~0.8.0"
+    "node": "~18.16.0"
   },
   "main": "exiv2",
   "scripts": {
