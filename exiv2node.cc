@@ -1,5 +1,5 @@
 #include <v8.h>
-#include <node_addon_api/napi.h>
+#include <napi.h>
 #include <node_api.h>
 #include <unistd.h>
 #include <string>
