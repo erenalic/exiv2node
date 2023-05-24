@@ -1,7 +1,5 @@
 #include <v8.h>
-#include <node.h>
-#include <node_buffer.h>
-#include <nan.h>
+#include <node_api.h>
 #include <unistd.h>
 #include <string>
 #include <map>
@@ -80,17 +78,17 @@ class GetTagsWorker : public Exiv2Worker {
   void HandleOKCallback () {
     Nan::HandleScope scope;
 
-    Local<Value> argv[2] = { Nan::Null(), Nan::Null() };
+    Local<Value> argv[2] = { Nan::Null<v8::Value>(), Nan::Null<v8::Value>() };
 
     if (!exifException.empty()){
-      argv[0] = Nan::New<String>(exifException.c_str()).ToLocalChecked();
+      argv[0] = Nan::New<v8::String>(exifException.c_str()).ToLocalChecked();
     } else if (!tags.empty()) {
-      Local<Object> hash = Nan::New<Object>();
+      Local<Object> hash = Nan::New<v8::Object>();
       // Copy the tags out.
       for (tag_map_t::iterator i = tags.begin(); i != tags.end(); ++i) {
         hash->Set(
-          Nan::New<String>(i->first.c_str()).ToLocalChecked(),
-          Nan::New<String>(i->second.c_str()).ToLocalChecked()
+          Nan::New<v8::String>(i->first.c_str()).ToLocalChecked(),
+          Nan::New<v8::String>(i->second.c_str()).ToLocalChecked()
         );
       }
       argv[1] = hash;
@@ -101,7 +99,7 @@ class GetTagsWorker : public Exiv2Worker {
   };
 };
 
-NAN_METHOD(GetImageTags) {
+NAN_METHOD_DEF(GetImageTags) {
   Nan::HandleScope scope;
 
   /* Usage arguments */
@@ -167,9 +165,9 @@ class SetTagsWorker : public Exiv2Worker {
     Nan::HandleScope scope;
 
     // Create an argument array for any errors.
-    Local<Value> argv[1] = { Nan::Null() };
+    Local<Value> argv[1] = { Nan::Null<v8::Value>() };
     if (!exifException.empty()) {
-      argv[0] = Nan::New<String>(exifException.c_str()).ToLocalChecked();
+      argv[0] = Nan::New<v8::String>(exifException.c_str()).ToLocalChecked();
     }
 
     // Pass the argv array object to our callback function.
@@ -177,7 +175,7 @@ class SetTagsWorker : public Exiv2Worker {
   };
 };
 
-NAN_METHOD(SetImageTags) {
+NAN_METHOD_DEF(SetImageTags) {
   Nan::HandleScope scope;
 
   /* Usage arguments */
@@ -261,9 +259,9 @@ class DeleteTagsWorker : public Exiv2Worker {
     Nan::HandleScope scope;
 
     // Create an argument array for any errors.
-    Local<Value> argv[1] = { Nan::Null() };
+    Local<Value> argv[1] = { Nan::Null<v8::Value>() };
     if (!exifException.empty()) {
-      argv[0] = Nan::New<String>(exifException.c_str()).ToLocalChecked();
+      argv[0] = Nan::New<v8::String>(exifException.c_str()).ToLocalChecked();
     }
 
     // Pass the argv array object to our callback function.
@@ -271,7 +269,7 @@ class DeleteTagsWorker : public Exiv2Worker {
   };
 };
 
-NAN_METHOD(DeleteImageTags) {
+NAN_METHOD_DEF(DeleteImageTags) {
   Nan::HandleScope scope;
 
   /* Usage arguments */
@@ -329,18 +327,18 @@ class GetPreviewsWorker : public Exiv2Worker {
   void HandleOKCallback () {
     Nan::HandleScope scope;
 
-    Local<Value> argv[2] = { Nan::Null(), Nan::Null() };
+    Local<Value> argv[2] = { Nan::Null<v8::Value>(), Nan::Null<v8::Value>() };
     if (!exifException.empty()){
-      argv[0] = Nan::New<String>(exifException.c_str()).ToLocalChecked();
+      argv[0] = Nan::New<v8::String>(exifException.c_str()).ToLocalChecked();
     } else {
       // Convert the data into V8 values.
-      Local<Array> array = Nan::New<Array>(previews.size());
+      Local<Array> array = Nan::New<v8::Array>>(previews.size());
       for (size_t i = 0; i < previews.size(); ++i) {
-        Local<Object> preview = Nan::New<Object>();
-        preview->Set(Nan::New<String>("mimeType").ToLocalChecked(), Nan::New<String>(previews[i].mimeType.c_str()).ToLocalChecked());
-        preview->Set(Nan::New<String>("height").ToLocalChecked(), Nan::New<Number>(previews[i].height));
-        preview->Set(Nan::New<String>("width").ToLocalChecked(), Nan::New<Number>(previews[i].width));
-        preview->Set(Nan::New<String>("data").ToLocalChecked(), Nan::CopyBuffer(previews[i].data, previews[i].size).ToLocalChecked());
+        Local<Object> preview = Nan::New<v8::Object>();
+        preview->Set(Nan::New<v8::String>("mimeType").ToLocalChecked(), Nan::New<v8::String>(previews[i].mimeType.c_str()).ToLocalChecked());
+        preview->Set(Nan::New<v8::String>("height").ToLocalChecked(), Nan::New<v8::Number>(previews[i].height));
+        preview->Set(Nan::New<v8::String>("width").ToLocalChecked(), Nan::New<v8::Number>(previews[i].width));
+        preview->Set(Nan::New<v8::String>("data").ToLocalChecked(), Nan::CopyBuffer(reinterpret_cast<char*>(previews[i].data, previews[i].size)).ToLocalChecked());
 
         array->Set(i, preview);
       }
@@ -381,7 +379,7 @@ class GetPreviewsWorker : public Exiv2Worker {
   std::vector<Preview> previews;
 };
 
-NAN_METHOD(GetImagePreviews) {
+NAN_METHOD_DEF(GetImagePreviews) {
   Nan::HandleScope scope;
 
   /* Usage arguments */
@@ -398,9 +396,9 @@ NAN_METHOD(GetImagePreviews) {
 // - - -
 
 void InitAll(Handle<Object> target) {
-  target->Set(Nan::New<String>("getImageTags").ToLocalChecked(), Nan::New<FunctionTemplate>(GetImageTags)->GetFunction());
-  target->Set(Nan::New<String>("setImageTags").ToLocalChecked(), Nan::New<FunctionTemplate>(SetImageTags)->GetFunction());
-  target->Set(Nan::New<String>("deleteImageTags").ToLocalChecked(), Nan::New<FunctionTemplate>(DeleteImageTags)->GetFunction());
-  target->Set(Nan::New<String>("getImagePreviews").ToLocalChecked(), Nan::New<FunctionTemplate>(GetImagePreviews)->GetFunction());
+  target->Set(Nan::New<v8::String>("getImageTags").ToLocalChecked(), Nan::New<FunctionTemplate>(GetImageTags)->GetFunction());
+  target->Set(Nan::New<v8::String>("setImageTags").ToLocalChecked(), Nan::New<FunctionTemplate>(SetImageTags)->GetFunction());
+  target->Set(Nan::New<v8::String>("deleteImageTags").ToLocalChecked(), Nan::New<FunctionTemplate>(DeleteImageTags)->GetFunction());
+  target->Set(Nan::New<v8::String>("getImagePreviews").ToLocalChecked(), Nan::New<FunctionTemplate>(GetImagePreviews)->GetFunction());
 }
 NODE_MODULE(exiv2, InitAll)
