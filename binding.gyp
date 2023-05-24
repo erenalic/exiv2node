@@ -1,26 +1,30 @@
 {
-  'targets': [
+  "targets": [
     {
-      'target_name': 'exiv2',
-      'sources': [
-        'exiv2node.cc'
+      "target_name": "exiv2node",
+      "sources": ["exiv2node.cc"],
+      "include_dirs": [
+        "<!(node -p \"require('node-addon-api').include\")",
+        "<!(pkg-config --cflags exiv2)"
       ],
-      'include_dirs' : [
-        '<!@(pkg-config --variable=includedir exiv2)',
-        "<!(node -e \"require('nan')\")",
-        "<!(node -p \"require('node-addon-api').include\")"
+      "libraries": ["<!(pkg-config --libs exiv2)"],
+      "cflags_cc": [
+        "-std=c++11",
+        "-stdlib=libc++",
+        "-fexceptions",
+        "-frtti"
       ],
-      'xcode_settings': {
-        'MACOSX_DEPLOYMENT_TARGET': '10.7',
-        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-        'OTHER_CPLUSPLUSFLAGS': ['-std=c++11', '-stdlib=libc++', '-fcxx-exceptions', '-frtti'],
+      "xcode_settings": {
+        "MACOSX_DEPLOYMENT_TARGET": "10.7",
+        "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+        "CLANG_CXX_LIBRARY": "libc++"
       },
-      'cflags_cc': [
-        '-fexceptions'
-      ],
-      'libraries': [
-        '<!@(pkg-config --libs exiv2)'
-      ],
+      "msvs_settings": {
+        "VCCLCompilerTool": {
+          "ExceptionHandling": 1,
+          "RuntimeLibrary": 3
+        }
+      }
     }
   ]
 }
