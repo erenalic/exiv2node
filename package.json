@@ -13,13 +13,13 @@
     "url": "git://github.com/erenalic/exiv2node.git"
   },
   "dependencies": {
-    "nan": "~2.2"
+    "nan": "~2.2",
+    "node-addon-api": "^6.1.0"
   },
   "devDependencies": {
-    "should": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "should": "*"
   },
-  "optionalDependencies": {},
   "engines": {
     "node": "~18.16.0"
   },
